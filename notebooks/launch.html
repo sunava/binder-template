@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RViz Desktop Launcher</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3efe7;
+      --panel: #fffdf8;
+      --line: #d8ccb8;
+      --text: #1f1a14;
+      --muted: #6d6255;
+      --accent: #9a3412;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #efe7dc 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    body {
+      display: grid;
+      grid-template-rows: auto 1fr;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 253, 248, 0.92);
+      backdrop-filter: blur(12px);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    p {
+      margin: 2px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: minmax(420px, 46vw) 1fr;
+      gap: 10px;
+      padding: 10px;
+      min-height: 0;
+    }
+
+    section {
+      min-width: 0;
+      min-height: 0;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--panel);
+      box-shadow: 0 10px 30px rgba(73, 46, 22, 0.08);
+    }
+
+    .panel-title {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: rgba(255, 250, 242, 0.8);
+    }
+
+    iframe {
+      display: block;
+      width: 100%;
+      height: calc(100% - 39px);
+      border: 0;
+      background: white;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        grid-template-rows: 52vh 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>RViz Desktop Launcher</h1>
+      <p>Native desktop on the left, notebook on the right. RViz is expected to be started by the container entrypoint.</p>
+    </div>
+    <nav>
+      <a id="desktop-link" href="#">Open desktop</a>
+      <a id="notebook-link" href="#">Open notebook</a>
+    </nav>
+  </header>
+  <main>
+    <section>
+      <div class="panel-title">Desktop</div>
+      <iframe id="desktop-frame" title="Desktop"></iframe>
+    </section>
+    <section>
+      <div class="panel-title">Notebook</div>
+      <iframe id="notebook-frame" title="Notebook"></iframe>
+    </section>
+  </main>
+  <script>
+    const path = window.location.pathname;
+    const basePath = path.includes("/files/") ? path.split("/files/")[0] : path.split("/lab/")[0];
+    const params = new URLSearchParams(window.location.search);
+    const notebookPath = params.get("notebook") || "notebooks/start_demo.ipynb";
+    const desktopUrl = `${basePath}/desktop`;
+    const notebookUrl = `${basePath}/lab/tree/${notebookPath}`;
+
+    document.getElementById("desktop-frame").src = desktopUrl;
+    document.getElementById("notebook-frame").src = notebookUrl;
+    document.getElementById("desktop-link").href = desktopUrl;
+    document.getElementById("notebook-link").href = notebookUrl;
+  </script>
+</body>
+</html>
