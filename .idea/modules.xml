@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/binder-template.iml" filepath="$PROJECT_DIR$/.idea/binder-template.iml" />
-      <module fileurl="file://$USER_HOME$/Downloads/pycram-d42a16bf1e8890314d8f0ef67238c93c545c94c5/.idea/pycram-d42a16bf1e8890314d8f0ef67238c93c545c94c5.iml" filepath="$USER_HOME$/Downloads/pycram-d42a16bf1e8890314d8f0ef67238c93c545c94c5/.idea/pycram-d42a16bf1e8890314d8f0ef67238c93c545c94c5.iml" />
     </modules>
   </component>
 </project>
