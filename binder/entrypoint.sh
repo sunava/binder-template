@@ -4,6 +4,20 @@ set -e
 
 source "${ROS_PATH}/setup.bash"
 
+log_startup_context() {
+    {
+        echo "=== Binder entrypoint startup context ==="
+        echo "date=$(date -Iseconds)"
+        echo "pwd=$(pwd)"
+        printf 'argv='
+        printf '%q ' "$@"
+        printf '\n'
+        echo "--- selected environment ---"
+        env | sort | grep -E '^(BINDER|JUPYTER|JUPYTERHUB|NB|REPO|URL|PATH|QUERY|ROBOT|TASK|ENVIRONMENT)=' || true
+        echo "=== end startup context ==="
+    } >&2
+}
+
 import_workspace() {
     local workspace_file="${JUPYTER_WORKSPACE_FILE:-/home/repo/new-workspace.jupyterlab-workspace}"
 
@@ -61,6 +75,7 @@ start_rviz() {
     ) &
 }
 
+log_startup_context "$@"
 import_workspace
 start_rviz
 
