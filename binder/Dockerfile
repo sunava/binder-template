@@ -24,7 +24,8 @@ RUN apt update && apt install -y --no-install-recommends \
     graphviz graphviz-dev \
     python3-vcstool \
     nodejs \
-    npm && \
+    npm \
+    wmctrl && \
     rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
