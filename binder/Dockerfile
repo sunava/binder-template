@@ -14,7 +14,19 @@ RUN python3 -m pip install -r /tmp/requirements.txt
 # Required
 # ------------------------------------------------------------
 USER root
-RUN apt update && apt install -y --no-install-recommends     ros-jazzy-ros2-control     ros-jazzy-ros2-controllers     ros-jazzy-hardware-interface     ros-jazzy-controller-manager     ros-jazzy-control-msgs     ros-jazzy-xacro     ros-jazzy-rqt-joint-trajectory-controller     python3-vcstool &&     rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y --no-install-recommends \
+    ros-jazzy-ros2-control \
+    ros-jazzy-ros2-controllers \
+    ros-jazzy-hardware-interface \
+    ros-jazzy-controller-manager \
+    ros-jazzy-control-msgs \
+    ros-jazzy-xacro \
+    ros-jazzy-rqt-joint-trajectory-controller \
+    python3-vcstool \
+    nodejs \
+    npm \
+    wmctrl && \
+    rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
 # Install demo repository and cram code
@@ -49,6 +61,12 @@ ENV CODE_WORKING_DIRECTORY=${REPO_DIR}
 
 # Copy RViz config
 COPY default.rviz /home/jovyan/.rviz2/default.rviz
+RUN mkdir -p /home/jovyan/.ipython/profile_default/startup /root/.ipython/profile_default/startup
+RUN cd ${REPO_DIR}/binder/desktop-widget && \
+    npm install && \
+    npm run build && \
+    jupyter labextension install . --no-build && \
+    jupyter lab build --minimize=False
 
 # The entrypoint of the docker image
 COPY binder/entrypoint.sh /entrypoint.sh
