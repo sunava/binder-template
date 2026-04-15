@@ -1,4 +1,3 @@
-
 # binder-template
 
 [![Binder](https://binder.intel4coro.de/badge_logo.svg)](https://binder.intel4coro.de/v2/gh/IntEL4CoRo/binder-template.git/main?urlpath=lab/workspaces/new-workspace)
