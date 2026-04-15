@@ -36,9 +36,8 @@ RUN pip install poetry
 RUN set -ex && \
     poetry config virtualenvs.create false && \
     mkdir -p ${HOME}/libs && cd ${HOME}/libs && \
-    git clone https://github.com/sunava/cognitive_robot_abstract_machine.git && \
+    git clone --branch thesis --single-branch https://github.com/sunava/cognitive_robot_abstract_machine.git && \
     cd cognitive_robot_abstract_machine && \
-    git checkout thesis && \
     git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo && \
     sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml && \
     poetry install
@@ -49,7 +48,8 @@ RUN set -ex && \
 # ROS2 workspace: giskardpy_ros (clone, deps, build)
 # ------------------------------------------------------------
 RUN pip install xacro
-
+RUN pip install owlready2
+RUN pip install SPARQLWrapper
 ARG ROS_DISTRO=jazzy
 ENV ROS_DISTRO=${ROS_DISTRO}
 
