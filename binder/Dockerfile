@@ -21,7 +21,6 @@ RUN apt update && apt install -y --no-install-recommends \
     ros-jazzy-control-msgs \
     ros-jazzy-xacro \
     ros-jazzy-rqt-joint-trajectory-controller \
-    graphviz graphviz-dev \
     python3-vcstool \
     nodejs \
     npm \
