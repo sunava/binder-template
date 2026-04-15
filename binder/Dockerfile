@@ -4,10 +4,11 @@ FROM intel4coro/jupyter-ros2:jazzy-py3.12
 USER root
 #============= Install extra software packages =============#
 # RUN apt update && apt install -y curl
+RUN apt update && apt install -y --no-install-recommends     graphviz     libgraphviz-dev     pkg-config &&     rm -rf /var/lib/apt/lists/*
 
 # Install python packages
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN python3 -m pip install -r /tmp/requirements.txt
 #===========================================================#
 # ------------------------------------------------------------
 # Required
