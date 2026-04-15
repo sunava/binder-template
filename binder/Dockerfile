@@ -36,8 +36,9 @@ RUN pip install poetry
 RUN set -ex && \
     poetry config virtualenvs.create false && \
     mkdir -p ${HOME}/libs && cd ${HOME}/libs && \
-    git clone --branch thesis --single-branch https://github.com/sunava/cognitive_robot_abstract_machine.git && \
+    git clone https://github.com/sunava/cognitive_robot_abstract_machine.git && \
     cd cognitive_robot_abstract_machine && \
+    git checkout thesis && \
     git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo && \
     sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml && \
     poetry install
