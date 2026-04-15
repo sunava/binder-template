@@ -38,7 +38,10 @@ RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME
     cd cognitive_robot_abstract_machine &&     git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo && \
     sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml && \
     poetry install &&     mkdir -p /workspace/ros/src &&     cd /workspace/ros/src && \
-    vcs import --input https://raw.githubusercontent.com/sunava/cognitive_robot_abstract_machine/thesis/pycram/rosinstall/pycram-ros2-dependencies.rosinstall && \
+    git clone -b ros-jazzy --single-branch https://github.com/code-iai/iai_maps.git && \
+    git clone -b ros-jazzy-main --single-branch https://github.com/code-iai/iai_pr2.git && \
+    git clone -b ros-jazzy --single-branch https://github.com/code-iai/iai_robots.git && \
+    git clone -b ros2-jazzy --single-branch https://github.com/code-iai/iai_stretch.git && \
     cd /workspace/ros &&     . /opt/ros/${ROS_DISTRO}/setup.sh &&     colcon build --symlink-install && \
     echo "source /workspace/ros/install/setup.bash" >> /root/.bashrc
 
