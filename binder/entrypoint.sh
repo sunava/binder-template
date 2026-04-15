@@ -4,6 +4,10 @@ set -e
 
 source "${ROS_PATH}/setup.bash"
 
+if [[ -f /workspace/ros/install/setup.bash ]]; then
+    source /workspace/ros/install/setup.bash
+fi
+
 log_startup_context() {
     local log_file="/tmp/binder-startup.log"
     {
