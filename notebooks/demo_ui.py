@@ -8,7 +8,7 @@ import ipywidgets as widgets
 from IPython.display import HTML, Markdown, display
 import sys
 
-sys.path.insert(0, "/home/hassouna/cognitive_robot_abstract_machine/pycram/demos")
+sys.path.insert(0, "/home/jovyan/libs/cognitive_robot_abstract_machine/pycram/demos")
 import numpy as np
 
 logging.getLogger("solvers").setLevel(logging.ERROR)
