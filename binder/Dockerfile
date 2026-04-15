@@ -33,7 +33,14 @@ RUN apt update && apt install -y --no-install-recommends \
 # ------------------------------------------------------------
 
 RUN python3 -m pip install poetry
-RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME}/libs && cd ${HOME}/libs &&     git clone --branch thesis --single-branch https://github.com/sunava/cognitive_robot_abstract_machine.git &&     cd cognitive_robot_abstract_machine &&     git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo &&     sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml &&     poetry install &&     mkdir -p /workspace/ros/src &&     cd /workspace/ros/src &&     vcs import --input https://raw.githubusercontent.com/cram2/pycram/main/rosinstall/pycram-ros2-dependencies.rosinstall &&     cd /workspace/ros &&     . /opt/ros/${ROS_DISTRO}/setup.sh &&     colcon build --symlink-install &&     echo "source /workspace/ros/install/setup.bash" >> /root/.bashrc
+RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME}/libs && cd ${HOME}/libs && \
+    git clone --branch thesis --single-branch https://github.com/sunava/cognitive_robot_abstract_machine.git && \
+    cd cognitive_robot_abstract_machine &&     git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo && \
+    sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml && \
+    poetry install &&     mkdir -p /workspace/ros/src &&     cd /workspace/ros/src && \
+    vcs import --input https://github.com/sunava/cognitive_robot_abstract_machine/blob/thesis/pycram/rosinstall/pycram-ros2-dependencies.rosinstall && \
+    cd /workspace/ros &&     . /opt/ros/${ROS_DISTRO}/setup.sh &&     colcon build --symlink-install && \
+    echo "source /workspace/ros/install/setup.bash" >> /root/.bashrc
 
 # ------------------------------------------------------------
 # ROS2 workspace: giskardpy_ros (clone, deps, build)
