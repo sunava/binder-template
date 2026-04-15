@@ -409,6 +409,7 @@ nvidia-smi
 
 ### Troubleshooting
 
+
 | Issue | Solution |
 |-------|----------|
 | Port already in use | Stop other services using port 8888 or change port mappings in `docker-compose.yml` |
