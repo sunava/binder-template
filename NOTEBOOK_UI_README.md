@@ -9,6 +9,31 @@ This Binder setup uses a notebook-native UI instead of passing `robot`, `action`
 - that cell calls `run_ui()` from `notebooks/demo_ui.py`
 - the user sees the selector UI directly inside the notebook
 
+## How to disable the startup automation
+
+The JupyterLab extension supports URL flags so other users can opt out without editing code.
+
+Available flags:
+
+- `autoRunUI=0` disables opening and auto-running `notebooks/demo.ipynb`
+- `autoOpenDesktop=0` disables opening the desktop split panel
+- `autoCollapseLeft=0` keeps the left sidebar open
+
+Example:
+
+```text
+...?urlpath=lab/workspaces/new-workspace?autoRunUI=0&autoOpenDesktop=0&autoCollapseLeft=0
+```
+
+Accepted false-like values are:
+
+- `0`
+- `false`
+- `off`
+- `no`
+
+If the flag is missing, the default behavior stays enabled.
+
 ## Where to edit the UI
 
 - Main UI code: [notebooks/demo_ui.py](/home/hassouna/binder-template/notebooks/demo_ui.py:1)

@@ -14,6 +14,17 @@ const COMMAND_ID = 'desktop-widget:open';
 const NAMESPACE = 'desktop-widget';
 const DEFAULT_NOTEBOOK = 'notebooks/demo.ipynb';
 
+const startupFlag = (name: string, defaultValue = true): boolean => {
+  const params = new URLSearchParams(window.location.search);
+  const raw = params.get(name);
+  if (raw === null) {
+    return defaultValue;
+  }
+
+  const normalized = raw.trim().toLowerCase();
+  return !['0', 'false', 'off', 'no'].includes(normalized);
+};
+
 class DesktopContent extends Widget {
   constructor() {
     super();
@@ -112,9 +123,21 @@ const plugin: JupyterFrontEndPlugin<void> = {
     });
 
     void app.restored.then(async () => {
-      void app.commands.execute('application:toggle-left-area');
-      await openNotebook();
-      await app.commands.execute(COMMAND_ID);
+      const autoRun = startupFlag('autoRunUI', true);
+      const autoOpenDesktop = startupFlag('autoOpenDesktop', true);
+      const autoCollapseLeft = startupFlag('autoCollapseLeft', true);
+
+      if (autoCollapseLeft) {
+        void app.commands.execute('application:toggle-left-area');
+      }
+
+      if (autoRun) {
+        await openNotebook();
+      }
+
+      if (autoOpenDesktop) {
+        await app.commands.execute(COMMAND_ID);
+      }
     });
   }
 };
