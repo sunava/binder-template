@@ -4,49 +4,24 @@ FROM intel4coro/jupyter-ros2:jazzy-py3.12
 USER root
 #============= Install extra software packages =============#
 # RUN apt update && apt install -y curl
+RUN apt update && apt install -y --no-install-recommends     graphviz     libgraphviz-dev     pkg-config     python3-dev     build-essential &&     rm -rf /var/lib/apt/lists/*
 
 # Install python packages
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install -r /tmp/requirements.txt
+RUN python3 -m pip install -r /tmp/requirements.txt
 #===========================================================#
 # ------------------------------------------------------------
 # Required
 # ------------------------------------------------------------
 USER root
-RUN apt update && apt install -y --no-install-recommends \
-    ros-jazzy-ros2-control \
-    ros-jazzy-ros2-controllers \
-    ros-jazzy-hardware-interface \
-    ros-jazzy-controller-manager \
-    ros-jazzy-control-msgs \
-    ros-jazzy-xacro \
-    ros-jazzy-rqt-joint-trajectory-controller \
-    graphviz graphviz-dev \
-    python3-vcstool && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt update && apt install -y --no-install-recommends     ros-jazzy-ros2-control     ros-jazzy-ros2-controllers     ros-jazzy-hardware-interface     ros-jazzy-controller-manager     ros-jazzy-control-msgs     ros-jazzy-xacro     ros-jazzy-rqt-joint-trajectory-controller     python3-vcstool &&     rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
 # Install demo repository and cram code
 # ------------------------------------------------------------
 
-RUN pip install poetry
-RUN set -ex && \
-    poetry config virtualenvs.create false && \
-    mkdir -p ${HOME}/libs && cd ${HOME}/libs && \
-    git clone --branch thesis --single-branch https://github.com/sunava/cognitive_robot_abstract_machine.git && \
-    cd cognitive_robot_abstract_machine && \
-    git pull && \
-    git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo && \
-    sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml && \
-    poetry install && \
-    cd  ${HOME}/libs && \
-    mkdir -p /workspace/ros/src && \
-    cd cd workspace/ros/src && \
-    vcs import --input https://raw.githubusercontent.com/cram2/pycram/main/rosinstall/pycram-ros2-dependencies.rosinstall && \
-    cd .. && \
-    colcon build --symlink-install && \
-    source install/setup.bash && \
-    echo "source /home/jovyan/libs/workspace/ros/install/setup.bash" >> ~/.bashrc
+RUN python3 -m pip install poetry
+RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME}/libs && cd ${HOME}/libs &&     git clone --branch thesis --single-branch https://github.com/sunava/cognitive_robot_abstract_machine.git &&     cd cognitive_robot_abstract_machine &&     git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo &&     sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml &&     poetry install &&     mkdir -p /workspace/ros/src &&     cd /workspace/ros/src &&     vcs import --input https://raw.githubusercontent.com/cram2/pycram/main/rosinstall/pycram-ros2-dependencies.rosinstall &&     cd /workspace/ros &&     . /opt/ros/${ROS_DISTRO}/setup.sh &&     colcon build --symlink-install &&     echo "source /workspace/ros/install/setup.bash" >> /root/.bashrc
 
 # ------------------------------------------------------------
 # ROS2 workspace: giskardpy_ros (clone, deps, build)
