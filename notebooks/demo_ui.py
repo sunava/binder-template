@@ -454,7 +454,6 @@ def run_ui(on_start=None):
 
     controls = widgets.VBox(
         [
-            left_intro,
             robot,
             action,
             environment,
