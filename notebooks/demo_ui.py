@@ -63,17 +63,14 @@ def _rviz_pids():
     return [int(line.strip()) for line in result.stdout.splitlines() if line.strip()]
 
 
-
 def _is_rviz_running():
     return bool(_rviz_pids())
-
 
 
 def _rviz_config_matches(config_path):
     if not ACTIVE_RVIZ_CONFIG_PATH.is_file():
         return False
     return ACTIVE_RVIZ_CONFIG_PATH.read_bytes() == config_path.read_bytes()
-
 
 
 def _reload_rviz_for_environment(environment):
@@ -408,10 +405,6 @@ def run_ui(on_start=None):
     left_intro = widgets.HTML(value="""
         <div class="demo-card">
           <div class="demo-card-title">Scenario Builder</div>
-          <div class="demo-card-copy">
-            Configure your demo stack directly inside the notebook. Pick a robot,
-            choose the action family, and select the target environment here.
-          </div>
         </div>
         """)
     left_intro.add_class("demo-scenario-card")
