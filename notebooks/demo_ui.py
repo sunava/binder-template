@@ -24,7 +24,7 @@ ROBOTS = ("hsrb", "stretch", "tiago", "g1", "justin", "armar7", "pr2")
 ACTIONS = ("cut", "mix", "wipe")
 ENVIRONMENTS = ("isr", "apartment", "kitchen")
 ACTION_OBJECT_OPTIONS = {
-    "cut": ("bread", "apple", "cucumber", "potato"),
+    "cut": ("bread", "apple", "cucumber"),
     "mix": ("bowl", "pot"),
     "wipe": (),
 }
@@ -722,6 +722,7 @@ def run_ui(on_start=None):
                     "robot": ROBOTS[-1],
                     "action": ACTIONS[0],
                     "environment": ENVIRONMENTS[0],
+                    "object_kind": _default_object_kind_for_action(ACTIONS[0]),
                 }
                 CURRENT_DEMO_SELECTION = selection.copy()
 
@@ -756,8 +757,18 @@ def run_ui(on_start=None):
                     description="Env",
                 )
 
+                object_kind = widgets.ToggleButtons(
+                    options=[(_style_label(value), value) for value in ACTION_OBJECT_OPTIONS[selection["action"]]],
+                    value=selection["object_kind"],
+                    description="Target",
+                    layout=widgets.Layout(display=""),
+                )
+                if not ACTION_OBJECT_OPTIONS[selection["action"]]:
+                    object_kind.layout.display = "none"
+
                 summary = widgets.HTML(value=_selection_summary(selection))
                 start_button = widgets.Button(description="Start Demo", icon="play")
+                running_notice = widgets.HTML(value="")
                 output = widgets.Output()
 
                 start_box = widgets.Box([start_button])
@@ -769,7 +780,9 @@ def run_ui(on_start=None):
                         robot,
                         action,
                         environment,
+                        object_kind,
                         start_box,
+                        running_notice,
                         output,
                     ]
                 )
@@ -779,13 +792,21 @@ def run_ui(on_start=None):
 
                 def _update_selection(change):
                     global CURRENT_DEMO_SELECTION
-                    selection[change["owner"].description.lower().replace("env", "environment")] = change["new"]
+                    key = change["owner"].description.lower().replace("env", "environment")
+                    selection[key] = change["new"]
+                    if key == "action":
+                        options = ACTION_OBJECT_OPTIONS.get(selection["action"], ())
+                        object_kind.options = [(_style_label(value), value) for value in options]
+                        object_kind.layout.display = "" if options else "none"
+                        selection["object_kind"] = options[0] if options else "wipe"
+                        object_kind.value = selection["object_kind"]
                     CURRENT_DEMO_SELECTION = selection.copy()
                     summary.value = _selection_summary(selection)
 
                 robot.observe(_update_selection, names="value")
                 action.observe(_update_selection, names="value")
                 environment.observe(_update_selection, names="value")
+                object_kind.observe(_update_selection, names="value")
 
                 def _default_start(current_selection):
                     with output:
@@ -799,7 +820,7 @@ def run_ui(on_start=None):
                             action=current_selection["action"],
                             robot_name=current_selection["robot"],
                             environment_name=current_selection["environment"],
-                            object_kind=current_selection.get("object_kind", "bread"),
+                            object_kind=current_selection["object_kind"],
                         )
 
 
@@ -827,7 +848,7 @@ def run_ui(on_start=None):
                 action=current_selection["action"],
                 robot_name=current_selection["robot"],
                 environment_name=current_selection["environment"],
-                object_kind=current_selection.get("object_kind", "bread"),
+                object_kind=current_selection["object_kind"],
             )
 
 
