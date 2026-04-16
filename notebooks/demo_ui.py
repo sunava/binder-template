@@ -42,6 +42,7 @@ BACKGROUND_IMAGE_PATH = (
 )
 RVIZ_CONFIG_DIRECTORY = Path(__file__).resolve().parent / "rviz"
 ACTIVE_RVIZ_CONFIG_PATH = Path("/home/jovyan/.rviz2/default.rviz")
+SHARED_RVIZ_CONFIG_PATH = RVIZ_CONFIG_DIRECTORY / "shared.rviz"
 DEMO_MODULE_SEARCH_PATHS = (
     Path("/home/jovyan/libs/cognitive_robot_abstract_machine/pycram/demos"),
     Path(__file__).resolve().parents[2]
@@ -55,28 +56,40 @@ for demo_path in reversed(DEMO_MODULE_SEARCH_PATHS):
         sys.path.insert(0, str(demo_path))
 
 
-def _is_rviz_running():
+def _rviz_pids():
     result = subprocess.run(
         ["pgrep", "-f", "(^|/)rviz2($| )"], capture_output=True, text=True, check=False
     )
-    return any(line.strip() for line in result.stdout.splitlines())
+    return [int(line.strip()) for line in result.stdout.splitlines() if line.strip()]
+
+
+
+def _is_rviz_running():
+    return bool(_rviz_pids())
+
+
+
+def _rviz_config_matches(config_path):
+    if not ACTIVE_RVIZ_CONFIG_PATH.is_file():
+        return False
+    return ACTIVE_RVIZ_CONFIG_PATH.read_bytes() == config_path.read_bytes()
 
 
 
 def _reload_rviz_for_environment(environment):
-    config_path = RVIZ_CONFIG_DIRECTORY / f"{environment}.rviz"
-    if not config_path.is_file():
+    if not SHARED_RVIZ_CONFIG_PATH.is_file():
         raise FileNotFoundError(
-            f"RViz config not found for environment {environment!r}: {config_path}"
+            f"Shared RViz config not found: {SHARED_RVIZ_CONFIG_PATH}"
         )
 
-    # Keep an existing RViz window alive; only seed the default config for the next start.
-    if _is_rviz_running():
-        return False
-
     ACTIVE_RVIZ_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(config_path, ACTIVE_RVIZ_CONFIG_PATH)
-    return True
+    config_matches = _rviz_config_matches(SHARED_RVIZ_CONFIG_PATH)
+    if not config_matches:
+        shutil.copyfile(SHARED_RVIZ_CONFIG_PATH, ACTIVE_RVIZ_CONFIG_PATH)
+
+    if _is_rviz_running():
+        return "preserved"
+    return "seeded"
 
 
 def _style_label(value):
