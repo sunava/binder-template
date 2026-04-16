@@ -23,9 +23,9 @@ warnings.filterwarnings("ignore", message=r".*scipy\.optimize\.linprog.*")
 
 ROBOTS = ("pr2", "hsrb", "stretch", "tiago", "g1", "justin", "armar7")
 ACTIONS = ("cut", "mix", "wipe")
-ENVIRONMENTS = ( "apartment", "kitchen", "isr")
+ENVIRONMENTS = ("apartment", "kitchen", "isr")
 ACTION_OBJECT_OPTIONS = {
-    "cut": ( "apple","bread" ,"cucumber"),
+    "cut": ("apple", "bread", "cucumber"),
     "mix": ("bowl", "pot"),
     "wipe": (),
 }
@@ -37,12 +37,17 @@ def _default_object_kind_for_action(action):
 
 
 CURRENT_DEMO_SELECTION = {}
-BACKGROUND_IMAGE_PATH = Path(__file__).resolve().parent.parent.joinpath("img", "ease-background.png")
+BACKGROUND_IMAGE_PATH = (
+    Path(__file__).resolve().parent.parent.joinpath("img", "ease-background.png")
+)
 RVIZ_CONFIG_DIRECTORY = Path(__file__).resolve().parent / "rviz"
 ACTIVE_RVIZ_CONFIG_PATH = Path("/home/jovyan/.rviz2/default.rviz")
 DEMO_MODULE_SEARCH_PATHS = (
     Path("/home/jovyan/libs/cognitive_robot_abstract_machine/pycram/demos"),
-    Path(__file__).resolve().parents[2] / "cognitive_robot_abstract_machine" / "pycram" / "demos",
+    Path(__file__).resolve().parents[2]
+    / "cognitive_robot_abstract_machine"
+    / "pycram"
+    / "demos",
 )
 
 for demo_path in reversed(DEMO_MODULE_SEARCH_PATHS):
@@ -53,12 +58,16 @@ for demo_path in reversed(DEMO_MODULE_SEARCH_PATHS):
 def _reload_rviz_for_environment(environment):
     config_path = RVIZ_CONFIG_DIRECTORY / f"{environment}.rviz"
     if not config_path.is_file():
-        raise FileNotFoundError(f"RViz config not found for environment {environment!r}: {config_path}")
+        raise FileNotFoundError(
+            f"RViz config not found for environment {environment!r}: {config_path}"
+        )
 
     ACTIVE_RVIZ_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(config_path, ACTIVE_RVIZ_CONFIG_PATH)
 
-    result = subprocess.run(["pgrep", "-f", "(^|/)rviz2($| )"], capture_output=True, text=True, check=False)
+    result = subprocess.run(
+        ["pgrep", "-f", "(^|/)rviz2($| )"], capture_output=True, text=True, check=False
+    )
     for line in result.stdout.splitlines():
         pid = line.strip()
         if not pid:
@@ -334,11 +343,7 @@ def _inject_styles():
             </style>
             """
 
-    display(
-        HTML(
-            style_template.replace("__BACKGROUND_IMAGE__", background_image)
-        )
-    )
+    display(HTML(style_template.replace("__BACKGROUND_IMAGE__", background_image)))
 
 
 def _selection_summary(selection):
@@ -383,8 +388,7 @@ def run_ui(on_start=None):
     }
     CURRENT_DEMO_SELECTION = selection.copy()
 
-    left_intro = widgets.HTML(
-        value="""
+    left_intro = widgets.HTML(value="""
         <div class="demo-card">
           <div class="demo-card-title">Scenario Builder</div>
           <div class="demo-card-copy">
@@ -392,8 +396,7 @@ def run_ui(on_start=None):
             choose the action family, and select the target environment here.
           </div>
         </div>
-        """
-    )
+        """)
     left_intro.add_class("demo-scenario-card")
 
     robot = widgets.ToggleButtons(
@@ -415,7 +418,10 @@ def run_ui(on_start=None):
     )
 
     object_kind = widgets.ToggleButtons(
-        options=[(_style_label(value), value) for value in ACTION_OBJECT_OPTIONS[selection["action"]]],
+        options=[
+            (_style_label(value), value)
+            for value in ACTION_OBJECT_OPTIONS[selection["action"]]
+        ],
         value=selection["object_kind"],
         description="Target",
         layout=widgets.Layout(display=""),
@@ -475,15 +481,7 @@ def run_ui(on_start=None):
     def _default_start(current_selection):
         with output:
             output.clear_output(wait=True)
-            display(Markdown("### Demo Request"))
-            display(
-                Markdown(
-                    f"- Robot: `{current_selection['robot']}`\n"
-                    f"- Action: `{current_selection['action']}`\n"
-                    f"- Environment: `{current_selection['environment']}`\n"
-                    f"- Object: `{current_selection['object_kind']}`"
-                )
-            )
+
         _reload_rviz_for_environment(current_selection["environment"])
         env = os.environ.copy()
         env["PYTHONPATH"] = _demo_pythonpath()
@@ -550,7 +548,9 @@ def run_ui(on_start=None):
 
         if isinstance(proc, subprocess.Popen):
             active_process["proc"] = proc
-            threading.Thread(target=_stream_demo_output, args=(proc,), daemon=True).start()
+            threading.Thread(
+                target=_stream_demo_output, args=(proc,), daemon=True
+            ).start()
             return
 
         _set_running_state(False, "")
