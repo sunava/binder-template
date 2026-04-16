@@ -57,10 +57,10 @@ RUN set -ex && \
            ros2_robotiq_gripper/robotiq_drivers \
            ros2_robotiq_gripper/robotiq_controllers \
            ros2_robotiq_gripper/robotiq_hardware_tests  \
-           realsense2_ros_mqtt_bridge  \
-           realsense2_rgbd_plugin  \
-           realsense2_camera_msgs \
-           realsense2_camera&& \
+           realsense-ros/realsense2_ros_mqtt_bridge  \
+           realsense-ros/realsense2_rgbd_plugin  \
+           realsense-ros/realsense2_camera_msgs \
+           realsense-ros/realsense2_camera && \
     find /workspace/ros/src -type f -name package.xml -path '*/robotiq_driver/package.xml' -execdir touch COLCON_IGNORE \; && \
     git clone https://github.com/sunava/isr_testbed.git && \
     git clone https://github.com/ipa320/cob_simulation.git && \
