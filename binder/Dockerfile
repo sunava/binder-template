@@ -46,8 +46,8 @@ RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME
     git clone -b ros2-main --single-branch https://github.com/code-iai/iai_tiago_description.git && \
     git clone -b jazzy --single-branch https://github.com/UniversalRobots/Universal_Robots_ROS2_Description.git && \
     git clone https://github.com/maltehue/ros2_robotiq_gripper.git && \
-    git clone git@github.com:sunava/isr_testbed.git && \
-    git clone git@github.com:ipa320/cob_simulation.git && \
+    git clone https://github.com/sunava/isr_testbed.git && \
+    git clone https://github.com/ipa320/cob_simulation.git && \
     cd /workspace/ros &&     . /opt/ros/${ROS_DISTRO}/setup.sh &&    colcon build --symlink-install --packages-skip cob_gazebo_tools cob_gazebo_objects cob_gazebo_worlds cob_gazebo cob_gazebo cob_gazebo cob_bringup_sim cob_simulation && \
     echo "source /workspace/ros/install/setup.bash" >> /root/.bashrc
 
