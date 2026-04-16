@@ -1,5 +1,8 @@
 import logging
 import os
+import shutil
+import signal
+import subprocess
 import warnings
 from base64 import b64encode
 from pathlib import Path
@@ -23,6 +26,24 @@ ENVIRONMENTS = ("isr", "apartment", "kitchen")
 
 CURRENT_DEMO_SELECTION = {}
 BACKGROUND_IMAGE_PATH = Path(__file__).resolve().parent.parent.joinpath("img", "ease-background.png")
+RVIZ_CONFIG_DIRECTORY = Path(__file__).resolve().parent / "rviz"
+ACTIVE_RVIZ_CONFIG_PATH = Path("/home/jovyan/.rviz2/default.rviz")
+
+
+def _reload_rviz_for_environment(environment):
+    config_path = RVIZ_CONFIG_DIRECTORY / f"{environment}.rviz"
+    if not config_path.is_file():
+        raise FileNotFoundError(f"RViz config not found for environment {environment!r}: {config_path}")
+
+    ACTIVE_RVIZ_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(config_path, ACTIVE_RVIZ_CONFIG_PATH)
+
+    result = subprocess.run(["pgrep", "-f", "(^|/)rviz2($| )"], capture_output=True, text=True, check=False)
+    for line in result.stdout.splitlines():
+        pid = line.strip()
+        if not pid:
+            continue
+        os.kill(int(pid), signal.SIGTERM)
 
 
 def _style_label(value):
@@ -365,6 +386,7 @@ def run_ui(on_start=None):
     def _default_start(current_selection):
         with output:
             output.clear_output(wait=True)
+            _reload_rviz_for_environment(current_selection["environment"])
             import os
             from base64 import b64encode
             from pathlib import Path
@@ -724,6 +746,7 @@ def run_ui(on_start=None):
                         display(Markdown("### Demo Request"))
 
                         print(current_selection)
+                        _reload_rviz_for_environment(current_selection["environment"])
 
                         from thesis_single_object import run_single_object_cut_demo
                         print("Please wait ~ Demo is starting..")
