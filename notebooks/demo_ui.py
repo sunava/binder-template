@@ -29,8 +29,6 @@ ACTIONS = ("cut", "mix", "wipe")
 ENVIRONMENTS = ("apartment", "kitchen", "isr")
 ACTION_OBJECT_OPTIONS = {
     "cut": ("apple", "bread", "cucumber"),
-    "mix": ("bowl"),
-    "wipe": (),
 }
 
 
@@ -470,7 +468,7 @@ def run_ui(on_start=None):
     CONTROL_KEYS = {
         "Robot": "robot",
         "Action": "action",
-        "Env": "environment",
+        "Environment": "environment",
         "Target": "object_kind",
     }
 
