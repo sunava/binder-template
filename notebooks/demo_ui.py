@@ -478,10 +478,14 @@ def run_ui(on_start=None):
         selection[key] = change["new"]
         if key == "action":
             options = ACTION_OBJECT_OPTIONS.get(selection["action"], ())
-            object_kind.options = [(_style_label(value), value) for value in options]
-            object_kind.layout.display = "" if options else "none"
+            object_kind.value = None
+            object_kind.options = tuple(
+                (_style_label(value), value) for value in options
+            )
+            object_kind.layout.display = "flex" if options else "none"
             selection["object_kind"] = options[0] if options else "wipe"
-            object_kind.value = selection["object_kind"]
+            if options:
+                object_kind.value = selection["object_kind"]
         CURRENT_DEMO_SELECTION = selection.copy()
         summary.value = _selection_summary(selection)
 
