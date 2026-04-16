@@ -395,7 +395,7 @@ def run_ui(on_start=None):
             from IPython.display import HTML, Markdown, display
 
 
-            ROBOTS = ("hsrb", "stretch", "tiago", "g1", "justin", "armar7", "pr2")
+            ROBOTS = ("hsrb", "stretch", "tiago", "g1", "justin", "pr2")
             ACTIONS = ("cut", "mix", "wipe")
             ENVIRONMENTS = ("isr", "apartment", "kitchen")
 
@@ -760,7 +760,11 @@ def run_ui(on_start=None):
 
                 def _handle_start(_):
                     callback = on_start or _default_start
-                    callback(selection.copy())
+                    start_button.disabled = True
+                    try:
+                        callback(selection.copy())
+                    finally:
+                        start_button.disabled = False
 
                 start_button.on_click(_handle_start)
 
@@ -783,7 +787,11 @@ def run_ui(on_start=None):
 
     def _handle_start(_):
         callback = on_start or _default_start
-        callback(selection.copy())
+        start_button.disabled = True
+        try:
+            callback(selection.copy())
+        finally:
+            start_button.disabled = False
 
     start_button.on_click(_handle_start)
 
