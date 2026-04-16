@@ -62,7 +62,7 @@ RUN set -ex && \
     . /opt/ros/${ROS_DISTRO}/setup.sh && \
     colcon build --symlink-install \
       --packages-skip cob_gazebo_tools cob_gazebo_objects cob_gazebo_worlds cob_gazebo cob_bringup_sim cob_simulation && \
-    echo "source /workspace/ros/install/setup.bash
+    echo "source /workspace/ros/install/setup.bash" >> /root/.bashrc
 
 # ------------------------------------------------------------
 # ROS2 workspace: giskardpy_ros (clone, deps, build)
