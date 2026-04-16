@@ -51,8 +51,8 @@ DEMO_MODULE_SEARCH_PATHS = (
     / "demos",
 )
 
-for demo_path in reversed(DEMO_MODULE_SEARCH_PATHS):
-    if demo_path.is_dir():
+for demo_path in DEMO_MODULE_SEARCH_PATHS:
+    if demo_path.is_dir() and str(demo_path) not in sys.path:
         sys.path.insert(0, str(demo_path))
 
 
