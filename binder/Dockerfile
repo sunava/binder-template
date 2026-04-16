@@ -33,11 +33,16 @@ RUN apt update && apt install -y --no-install-recommends \
 # ------------------------------------------------------------
 
 RUN python3 -m pip install poetry
-RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME}/libs && cd ${HOME}/libs && \
+RUN set -ex && \
+    poetry config virtualenvs.create false && \
+    mkdir -p ${HOME}/libs && cd ${HOME}/libs && \
     git clone --branch thesis --single-branch https://github.com/sunava/cognitive_robot_abstract_machine.git && \
-    cd cognitive_robot_abstract_machine &&     git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo && \
+    cd cognitive_robot_abstract_machine && \
+    git clone https://github.com/sunava/pycram_object_gap_demo.git pycram/resources/pycram_object_gap_demo && \
     sed -i '/^[[:space:]]*random_events[[:space:]]*=.*$/d' pyproject.toml && \
-    poetry install &&     mkdir -p /workspace/ros/src &&     cd /workspace/ros/src && \
+    poetry install && \
+    mkdir -p /workspace/ros/src && \
+    cd /workspace/ros/src && \
     git clone -b ros-jazzy --single-branch https://github.com/code-iai/iai_maps.git && \
     git clone -b ros-jazzy-main --single-branch https://github.com/code-iai/iai_pr2.git && \
     git clone -b ros-jazzy --single-branch https://github.com/code-iai/iai_robots.git && \
@@ -46,10 +51,18 @@ RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME
     git clone -b ros2-main --single-branch https://github.com/code-iai/iai_tiago_description.git && \
     git clone -b jazzy --single-branch https://github.com/UniversalRobots/Universal_Robots_ROS2_Description.git && \
     git clone https://github.com/maltehue/ros2_robotiq_gripper.git && \
+    rm -rf ros2_robotiq_gripper/robotiq_driver \
+           ros2_robotiq_gripper/robotiq_drivers \
+           ros2_robotiq_gripper/robotiq_controllers \
+           ros2_robotiq_gripper/robotiq_hardware_tests && \
+    find /workspace/ros/src -type f -name package.xml -path '*/robotiq_driver/package.xml' -execdir touch COLCON_IGNORE \; && \
     git clone https://github.com/sunava/isr_testbed.git && \
     git clone https://github.com/ipa320/cob_simulation.git && \
-    cd /workspace/ros &&     . /opt/ros/${ROS_DISTRO}/setup.sh &&    colcon build --symlink-install --packages-skip cob_gazebo_tools cob_gazebo_objects cob_gazebo_worlds cob_gazebo cob_gazebo cob_gazebo cob_bringup_sim cob_simulation && \
-    echo "source /workspace/ros/install/setup.bash" >> /root/.bashrc
+    cd /workspace/ros && \
+    . /opt/ros/${ROS_DISTRO}/setup.sh && \
+    colcon build --symlink-install \
+      --packages-skip cob_gazebo_tools cob_gazebo_objects cob_gazebo_worlds cob_gazebo cob_bringup_sim cob_simulation && \
+    echo "source /workspace/ros/install/setup.bash
 
 # ------------------------------------------------------------
 # ROS2 workspace: giskardpy_ros (clone, deps, build)
