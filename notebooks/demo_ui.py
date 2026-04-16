@@ -20,11 +20,11 @@ warnings.filterwarnings("ignore", message=r".*cvxopt\.glpk.*")
 warnings.filterwarnings("ignore", message=r".*scipy\.optimize\.linprog.*")
 
 
-ROBOTS = ("hsrb", "stretch", "tiago", "g1", "justin", "armar7", "pr2")
+ROBOTS = ("pr2", "hsrb", "stretch", "tiago", "g1", "justin", "armar7")
 ACTIONS = ("cut", "mix", "wipe")
-ENVIRONMENTS = ("isr", "apartment", "kitchen")
+ENVIRONMENTS = ( "apartment", "kitchen", "isr")
 ACTION_OBJECT_OPTIONS = {
-    "cut": ("bread", "apple", "cucumber"),
+    "cut": ( "apple","bread" ,"cucumber"),
     "mix": ("bowl", "pot"),
     "wipe": (),
 }

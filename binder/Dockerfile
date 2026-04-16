@@ -50,12 +50,17 @@ RUN set -ex && \
     git clone -b ros2-jazzy --single-branch https://github.com/code-iai/iai_stretch.git && \
     git clone -b ros2-jazzy --single-branch https://github.com/code-iai/hsr_description.git && \
     git clone -b ros2-main --single-branch https://github.com/code-iai/iai_tiago_description.git && \
+    git clone -b ros2-master --single-branch https://github.com/realsenseai/realsense-ros.git && \
     git clone -b jazzy --single-branch https://github.com/UniversalRobots/Universal_Robots_ROS2_Description.git && \
     git clone https://github.com/maltehue/ros2_robotiq_gripper.git && \
     rm -rf ros2_robotiq_gripper/robotiq_driver \
            ros2_robotiq_gripper/robotiq_drivers \
            ros2_robotiq_gripper/robotiq_controllers \
-           ros2_robotiq_gripper/robotiq_hardware_tests && \
+           ros2_robotiq_gripper/robotiq_hardware_tests  \
+           realsense2_ros_mqtt_bridge  \
+           realsense2_rgbd_plugin  \
+           realsense2_camera_msgs \
+           realsense2_camera&& \
     find /workspace/ros/src -type f -name package.xml -path '*/robotiq_driver/package.xml' -execdir touch COLCON_IGNORE \; && \
     git clone https://github.com/sunava/isr_testbed.git && \
     git clone https://github.com/ipa320/cob_simulation.git && \
