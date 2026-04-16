@@ -248,6 +248,17 @@ def _inject_styles():
                 font-size: 13px;
                 line-height: 1.5;
             }
+            .demo-running-note {
+                margin-top: 14px;
+                padding: 16px 18px;
+                border-radius: 16px;
+                background: linear-gradient(135deg, #fff4df 0%, #ffe8bf 100%);
+                border: 1px solid #f1c97a;
+                color: #7a4b00;
+                font-size: 17px;
+                font-weight: 700;
+                line-height: 1.4;
+            }
             .demo-subtle-list {
                 display: grid;
                 gap: 10px;
@@ -354,6 +365,7 @@ def run_ui(on_start=None):
 
     summary = widgets.HTML(value=_selection_summary(selection))
     start_button = widgets.Button(description="Start Demo", icon="play")
+    running_notice = widgets.HTML(value="")
     output = widgets.Output()
 
     start_box = widgets.Box([start_button])
@@ -366,6 +378,7 @@ def run_ui(on_start=None):
             action,
             environment,
             start_box,
+            running_notice,
             output,
         ]
     )
@@ -745,25 +758,24 @@ def run_ui(on_start=None):
                         output.clear_output(wait=True)
                         display(Markdown("### Demo Request"))
 
-                        print(current_selection)
                         _reload_rviz_for_environment(current_selection["environment"])
 
                         from thesis_single_object import run_single_object_cut_demo
-                        print("Please wait ~ Demo is starting..")
                         run_single_object_cut_demo(
                             robot_name=current_selection["robot"],
                             environment_name=current_selection["environment"],
                             object_kind="bread",
                         )
 
-                        print("Please wait ~ Demo is starting..")
 
                 def _handle_start(_):
                     callback = on_start or _default_start
                     start_button.disabled = True
+                    running_notice.value = '<div class="demo-running-note">Please be patient. Demo is running.</div>'
                     try:
                         callback(selection.copy())
                     finally:
+                        running_notice.value = ""
                         start_button.disabled = False
 
                 start_button.on_click(_handle_start)
@@ -775,9 +787,7 @@ def run_ui(on_start=None):
 
             show_demo_ui = run_ui
 
-            print(current_selection)
             from thesis_single_object import run_single_object_cut_demo
-            print("Please wait ~ Demo is starting..")
             run_single_object_cut_demo(
                 robot_name=current_selection["robot"],
                 environment_name=current_selection["environment"],
@@ -788,9 +798,11 @@ def run_ui(on_start=None):
     def _handle_start(_):
         callback = on_start or _default_start
         start_button.disabled = True
+        running_notice.value = '<div class="demo-running-note">Please be patient. Demo is running.</div>'
         try:
             callback(selection.copy())
         finally:
+            running_notice.value = ""
             start_button.disabled = False
 
     start_button.on_click(_handle_start)
