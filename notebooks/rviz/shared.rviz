@@ -239,7 +239,7 @@ Visualization Manager:
       Name: Current View
       Near Clip Distance: 0.009999999776482582
       Pitch: 0.6147968769073486
-      Target Frame: <Fixed Frame>
+      Target Frame: demo_camera_target
       Value: Orbit (rviz_default_plugins)
       Yaw: 3.3694169521331787
     Saved: ~
