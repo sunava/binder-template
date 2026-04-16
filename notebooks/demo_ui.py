@@ -55,6 +55,14 @@ for demo_path in reversed(DEMO_MODULE_SEARCH_PATHS):
         sys.path.insert(0, str(demo_path))
 
 
+def _is_rviz_running():
+    result = subprocess.run(
+        ["pgrep", "-f", "(^|/)rviz2($| )"], capture_output=True, text=True, check=False
+    )
+    return any(line.strip() for line in result.stdout.splitlines())
+
+
+
 def _reload_rviz_for_environment(environment):
     config_path = RVIZ_CONFIG_DIRECTORY / f"{environment}.rviz"
     if not config_path.is_file():
@@ -62,17 +70,13 @@ def _reload_rviz_for_environment(environment):
             f"RViz config not found for environment {environment!r}: {config_path}"
         )
 
+    # Keep an existing RViz window alive; only seed the default config for the next start.
+    if _is_rviz_running():
+        return False
+
     ACTIVE_RVIZ_CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(config_path, ACTIVE_RVIZ_CONFIG_PATH)
-
-    result = subprocess.run(
-        ["pgrep", "-f", "(^|/)rviz2($| )"], capture_output=True, text=True, check=False
-    )
-    for line in result.stdout.splitlines():
-        pid = line.strip()
-        if not pid:
-            continue
-        os.kill(int(pid), signal.SIGTERM)
+    return True
 
 
 def _style_label(value):
