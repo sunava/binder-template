@@ -42,7 +42,7 @@ RUN set -ex &&     poetry config virtualenvs.create false &&     mkdir -p ${HOME
     git clone -b ros-jazzy-main --single-branch https://github.com/code-iai/iai_pr2.git && \
     git clone -b ros-jazzy --single-branch https://github.com/code-iai/iai_robots.git && \
     git clone -b ros2-jazzy --single-branch https://github.com/code-iai/iai_stretch.git && \
-    git clone -b ros2-jazzy -- single-branch https://github.com/code-iai/hsr_description.git && \
+    git clone -b ros2-jazzy --single-branch https://github.com/code-iai/hsr_description.git && \
     git clone -b ros2-main --single-branch https://github.com/code-iai/iai_tiago_description.git && \
     git clone -b jazzy --single-branch https://github.com/UniversalRobots/Universal_Robots_ROS2_Description.git && \
     git clone https://github.com/maltehue/ros2_robotiq_gripper.git && \
