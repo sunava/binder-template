@@ -5,6 +5,9 @@ import signal
 import subprocess
 import threading
 import warnings
+
+logging.disable(logging.CRITICAL)
+os.environ.setdefault("PYTHONWARNINGS", "ignore")
 from base64 import b64encode
 from json import dumps as json_dumps
 from pathlib import Path
@@ -21,12 +24,12 @@ warnings.filterwarnings("ignore", message=r".*cvxopt\.glpk.*")
 warnings.filterwarnings("ignore", message=r".*scipy\.optimize\.linprog.*")
 
 
-ROBOTS = ("pr2", "hsrb", "stretch", "tiago", "g1", "justin", "armar7")
+ROBOTS = ("pr2", "hsrb", "stretch", "tiago", "g1", "justin")
 ACTIONS = ("cut", "mix", "wipe")
 ENVIRONMENTS = ("apartment", "kitchen", "isr")
 ACTION_OBJECT_OPTIONS = {
     "cut": ("apple", "bread", "cucumber"),
-    "mix": ("bowl", "pot"),
+    "mix": ("bowl"),
     "wipe": (),
 }
 
@@ -107,7 +110,9 @@ def _build_demo_subprocess_command():
         "-u",
         "-c",
         (
-            "import json, os; "
+            "import json, logging, os, warnings; "
+            "logging.disable(logging.CRITICAL); "
+            "warnings.filterwarnings('ignore'); "
             "from thesis_single_object import run_single_object_demo; "
             "selection = json.loads(os.environ['DEMO_UI_SELECTION']); "
             "run_single_object_demo("
@@ -402,13 +407,6 @@ def run_ui(on_start=None):
     }
     CURRENT_DEMO_SELECTION = selection.copy()
 
-    left_intro = widgets.HTML(value="""
-        <div class="demo-card">
-          <div class="demo-card-title">Scenario Builder</div>
-        </div>
-        """)
-    left_intro.add_class("demo-scenario-card")
-
     robot = widgets.ToggleButtons(
         options=[(_style_label(value), value) for value in ROBOTS],
         value=selection["robot"],
@@ -503,12 +501,11 @@ def run_ui(on_start=None):
         env = os.environ.copy()
         env["PYTHONPATH"] = _demo_pythonpath()
         env["DEMO_UI_SELECTION"] = json_dumps(current_selection)
+        env["PYTHONWARNINGS"] = "ignore"
         return subprocess.Popen(
             _build_demo_subprocess_command(),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
             env=env,
             start_new_session=True,
         )
