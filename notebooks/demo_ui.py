@@ -460,9 +460,16 @@ def run_ui(on_start=None):
     controls.add_class("demo-ui")
     controls.add_class("demo-controls")
 
+    CONTROL_KEYS = {
+        "Robot": "robot",
+        "Action": "action",
+        "Env": "environment",
+        "Target": "object_kind",
+    }
+
     def _update_selection(change):
         global CURRENT_DEMO_SELECTION
-        key = change["owner"].description.lower().replace("env", "environment")
+        key = CONTROL_KEYS[change["owner"].description]
         selection[key] = change["new"]
         if key == "action":
             options = ACTION_OBJECT_OPTIONS.get(selection["action"], ())
