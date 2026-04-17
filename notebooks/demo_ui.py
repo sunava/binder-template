@@ -33,9 +33,9 @@ ACTION_DEFAULT_OBJECT_KIND = {
     "wipe": "wipe",
 }
 VIDEO_FILES = (
-    ("PR2 Cutting Bread", "assets/cuttin_real_pr2.mp4"),
-    ("G1 Simulation Cutting Bread", "assets/g1_simu.mp4"),
-    ("Cutting Experiment Multiple Robots", "assets/all_robots.mp4"),
+    ("PR2 Real", "assets/cuttin_real_pr2.mp4"),
+    ("G1 Simulation", "assets/g1_simu.mp4"),
+    ("Multiple Robots", "assets/all_robots.mp4"),
 )
 FAQ_ITEMS = (
     (
