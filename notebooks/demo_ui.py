@@ -33,7 +33,8 @@ ACTION_DEFAULT_OBJECT_KIND = {
     "wipe": "wipe",
 }
 VIDEO_FILES = (
-    ("Recorded Cut Demo", "assets/cuttin_real_pr2.mp4"),
+    ("PR2 Cutting Bread", "assets/cuttin_real_pr2.mp4"),
+    ("G1 Simulation Cutting Bread", "assets/g1_simu.mp4"),
 )
 FAQ_ITEMS = (
     (
@@ -45,8 +46,8 @@ FAQ_ITEMS = (
         "RViz and the underlying demo process need a few seconds to start.",
     ),
     (
-        "How do I stop a running demo?",
-        "Use Stop Demo to terminate the active subprocess cleanly.",
+        "Why is the camera wrong?",
+        "The camera is attached to a link, so you may need to adjust it slightly yourself. When you choose a different environment, it will jump again.",
     ),
 )
 
@@ -463,6 +464,7 @@ def _first_available_video():
 
 
 def _video_card_html(title, video_path):
+    video_data = b64encode(video_path.read_bytes()).decode("ascii")
     return f"""
     <div class="demo-card">
       <div class="demo-section-title">{title}</div>
@@ -470,7 +472,7 @@ def _video_card_html(title, video_path):
         Recorded example run from the notebook assets directory.
       </div>
       <video class="demo-video" controls autoplay muted preload="metadata">
-        <source src="{video_path.as_posix()}" type="video/mp4">
+        <source src="data:video/mp4;base64,{video_data}" type="video/mp4">
         Your browser does not support the video tag.
       </video>
     </div>
@@ -482,15 +484,11 @@ def _faq_section():
 
     answers = []
     for _, answer in FAQ_ITEMS:
-        answers.append(
-            widgets.HTML(
-                value=f"""
+        answers.append(widgets.HTML(value=f"""
                 <div class="demo-section-copy" style="margin: 0; padding: 2px 0 8px 0;">
                   {answer}
                 </div>
-                """
-            )
-        )
+                """))
 
     accordion = widgets.Accordion(children=answers, selected_index=None)
     for index, (question, _) in enumerate(FAQ_ITEMS):
@@ -505,15 +503,13 @@ def _faq_section():
     video_button_box.add_class("demo-faq-button")
 
     if video_entry is None:
-        video_panel = widgets.HTML(
-            value="""
+        video_panel = widgets.HTML(value="""
             <div class="demo-card">
               <div class="demo-section-copy" style="margin-bottom: 0;">
                 No recorded demo video was found in the notebook assets directory.
               </div>
             </div>
-            """
-        )
+            """)
     else:
         video_panel = widgets.HTML(value="")
 
@@ -527,16 +523,14 @@ def _faq_section():
 
     wrapper = widgets.VBox(
         [
-            widgets.HTML(
-                value="""
+            widgets.HTML(value="""
                 <div class="demo-card">
                   <div class="demo-section-title">FAQ</div>
                   <div class="demo-section-copy">
                     Short answers to common setup issues. Use the button below to launch the recorded demo inline.
                   </div>
                 </div>
-                """
-            ),
+                """),
             video_button_box,
             accordion,
             video_panel,
@@ -585,7 +579,6 @@ def run_ui(on_start=None):
         description="Env",
     )
 
-
     summary = widgets.HTML(value=_selection_summary(selection))
     start_button = widgets.Button(description="Start Demo", icon="play")
     stop_button = widgets.Button(
@@ -627,7 +620,9 @@ def run_ui(on_start=None):
         key = CONTROL_KEYS[change["owner"].description]
         selection[key] = change["new"]
         if key == "action":
-            selection["object_kind"] = _default_object_kind_for_action(selection["action"])
+            selection["object_kind"] = _default_object_kind_for_action(
+                selection["action"]
+            )
         CURRENT_DEMO_SELECTION = selection.copy()
         summary.value = _selection_summary(selection)
 
