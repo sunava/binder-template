@@ -455,7 +455,7 @@ def run_ui(on_start=None):
             robot,
             action,
             environment,
-            object_kind,
+            object_kind_box,
             start_box,
             running_notice,
             output,
