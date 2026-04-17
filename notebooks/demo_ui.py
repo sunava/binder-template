@@ -35,6 +35,7 @@ ACTION_DEFAULT_OBJECT_KIND = {
 VIDEO_FILES = (
     ("PR2 Cutting Bread", "assets/cuttin_real_pr2.mp4"),
     ("G1 Simulation Cutting Bread", "assets/g1_simu.mp4"),
+    ("Cutting Experiment Multiple Robots", "assets/all_robots.mp4"),
 )
 FAQ_ITEMS = (
     (
@@ -454,13 +455,14 @@ def _selection_summary(selection):
     """
 
 
-def _first_available_video():
+def _available_videos():
     base_dir = Path(__file__).resolve().parent
+    videos = []
     for title, relative_path in VIDEO_FILES:
         video_path = base_dir / relative_path
         if video_path.is_file():
-            return title, video_path
-    return None
+            videos.append((title, video_path))
+    return videos
 
 
 def _video_card_html(title, video_path):
@@ -480,7 +482,7 @@ def _video_card_html(title, video_path):
 
 
 def _faq_section():
-    video_entry = _first_available_video()
+    video_entries = _available_videos()
 
     answers = []
     for _, answer in FAQ_ITEMS:
@@ -494,15 +496,9 @@ def _faq_section():
     for index, (question, _) in enumerate(FAQ_ITEMS):
         accordion.set_title(index, question)
 
-    video_button = widgets.Button(
-        description="Play Recorded Demo",
-        icon="play",
-        disabled=video_entry is None,
-    )
-    video_button_box = widgets.Box([video_button])
-    video_button_box.add_class("demo-faq-button")
+    video_buttons = []
 
-    if video_entry is None:
+    if not video_entries:
         video_panel = widgets.HTML(value="""
             <div class="demo-card">
               <div class="demo-section-copy" style="margin-bottom: 0;">
@@ -513,13 +509,21 @@ def _faq_section():
     else:
         video_panel = widgets.HTML(value="")
 
-    def _show_video(_):
-        if video_entry is None:
-            return
-        title, video_path = video_entry
-        video_panel.value = _video_card_html(title, video_path)
+        for title, video_path in video_entries:
+            button = widgets.Button(
+                description=f"Video: {title}",
+                icon="play",
+            )
+            button.add_class("demo-faq-video-button")
 
-    video_button.on_click(_show_video)
+            def _show_video(_, current_title=title, current_video_path=video_path):
+                video_panel.value = _video_card_html(current_title, current_video_path)
+
+            button.on_click(_show_video)
+            video_buttons.append(button)
+
+    video_button_box = widgets.Box(video_buttons)
+    video_button_box.add_class("demo-faq-button")
 
     wrapper = widgets.VBox(
         [
@@ -527,7 +531,7 @@ def _faq_section():
                 <div class="demo-card">
                   <div class="demo-section-title">FAQ</div>
                   <div class="demo-section-copy">
-                    Short answers to common setup issues. Use the button below to launch the recorded demo inline.
+                    Short answers to common setup issues. Use the buttons below to launch the recorded demos inline.
                   </div>
                 </div>
                 """),
