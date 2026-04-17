@@ -453,6 +453,7 @@ def run_ui(on_start=None):
     CONTROL_KEYS = {
         "Robot": "robot",
         "Action": "action",
+        "Env": "environment",
         "Environment": "environment",
     }
 
