@@ -43,6 +43,10 @@ FAQ_ITEMS = (
         "Choose a robot, action, and environment, then click Start Demo.",
     ),
     (
+        "Why do I see multiple items?",
+        "When multiple items appear, select a different environment to reset the publisher."
+    ),
+    (
         "Why does the demo take a moment to appear?",
         "RViz and the underlying demo process need a few seconds to start.",
     ),
