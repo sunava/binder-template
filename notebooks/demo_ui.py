@@ -27,14 +27,15 @@ warnings.filterwarnings("ignore", message=r".*scipy\.optimize\.linprog.*")
 ROBOTS = ("pr2", "hsrb", "stretch", "tiago", "g1", "justin")
 ACTIONS = ("cut", "mix", "wipe")
 ENVIRONMENTS = ("apartment", "kitchen", "isr")
-ACTION_OBJECT_OPTIONS = {
-    "cut": ("apple", "bread", "cucumber"),
+ACTION_DEFAULT_OBJECT_KIND = {
+    "cut": "bread",
+    "mix": "bowl",
+    "wipe": "wipe",
 }
 
 
 def _default_object_kind_for_action(action):
-    options = ACTION_OBJECT_OPTIONS.get(action, ())
-    return options[0] if options else "wipe"
+    return ACTION_DEFAULT_OBJECT_KIND.get(action, "bread")
 
 
 CURRENT_DEMO_SELECTION = {}
@@ -379,10 +380,6 @@ def _selection_summary(selection):
           <div class="demo-badge-label">Environment</div>
           <div class="demo-badge-value">{_style_label(selection['environment'])}</div>
         </div>
-        <div class="demo-badge">
-          <div class="demo-badge-label">Target</div>
-          <div class="demo-badge-value">{_style_label(selection.get('object_kind', 'wipe'))}</div>
-        </div>
       </div>
       <div class="demo-note">
         This notebook is the single launch entrypoint. Change the stack here instead of
@@ -423,17 +420,6 @@ def run_ui(on_start=None):
         description="Env",
     )
 
-    object_kind = widgets.ToggleButtons(
-        options=[
-            (_style_label(value), value)
-            for value in ACTION_OBJECT_OPTIONS[selection["action"]]
-        ],
-        value=selection["object_kind"],
-        description="Target",
-    )
-    object_kind_box = widgets.Box([object_kind], layout=widgets.Layout(display=""))
-    if not ACTION_OBJECT_OPTIONS[selection["action"]]:
-        object_kind_box.layout.display = "none"
 
     summary = widgets.HTML(value=_selection_summary(selection))
     start_button = widgets.Button(description="Start Demo", icon="play")
@@ -455,7 +441,6 @@ def run_ui(on_start=None):
             robot,
             action,
             environment,
-            object_kind_box,
             start_box,
             running_notice,
             output,
@@ -469,7 +454,6 @@ def run_ui(on_start=None):
         "Robot": "robot",
         "Action": "action",
         "Environment": "environment",
-        "Target": "object_kind",
     }
 
     def _update_selection(change):
@@ -477,22 +461,13 @@ def run_ui(on_start=None):
         key = CONTROL_KEYS[change["owner"].description]
         selection[key] = change["new"]
         if key == "action":
-            options = ACTION_OBJECT_OPTIONS.get(selection["action"], ())
-            object_kind.value = None
-            object_kind.options = tuple(
-                (_style_label(value), value) for value in options
-            )
-            object_kind.layout.display = "flex" if options else "none"
-            selection["object_kind"] = options[0] if options else "wipe"
-            if options:
-                object_kind.value = selection["object_kind"]
+            selection["object_kind"] = _default_object_kind_for_action(selection["action"])
         CURRENT_DEMO_SELECTION = selection.copy()
         summary.value = _selection_summary(selection)
 
     robot.observe(_update_selection, names="value")
     action.observe(_update_selection, names="value")
     environment.observe(_update_selection, names="value")
-    object_kind.observe(_update_selection, names="value")
 
     def _default_start(current_selection):
         with output:
@@ -517,7 +492,6 @@ def run_ui(on_start=None):
         robot.disabled = is_running
         action.disabled = is_running
         environment.disabled = is_running
-        object_kind.disabled = is_running
         running_notice.value = message
 
     def _cleanup_process(proc, *, was_stopped=None):
