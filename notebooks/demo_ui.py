@@ -32,6 +32,23 @@ ACTION_DEFAULT_OBJECT_KIND = {
     "mix": "bowl",
     "wipe": "wipe",
 }
+VIDEO_FILES = (
+    ("Recorded Cut Demo", "assets/cuttin_real_pr2.mp4"),
+)
+FAQ_ITEMS = (
+    (
+        "How do I start the demo?",
+        "Choose a robot, action, and environment, then click Start Demo.",
+    ),
+    (
+        "Why does the demo take a moment to appear?",
+        "RViz and the underlying demo process need a few seconds to start.",
+    ),
+    (
+        "How do I stop a running demo?",
+        "Use Stop Demo to terminate the active subprocess cleanly.",
+    ),
+)
 
 
 def _default_object_kind_for_action(action):
@@ -353,6 +370,53 @@ def _inject_styles():
                 border-radius: 999px;
                 background: linear-gradient(135deg, #2f6fa3 0%, #4d8fc4 100%);
             }
+            .demo-stack {
+                display: grid;
+                gap: 18px;
+                margin-top: 18px;
+                width: min(100%, 860px);
+            }
+            .demo-section-title {
+                font-size: 18px;
+                font-weight: 700;
+                margin-bottom: 6px;
+            }
+            .demo-section-copy {
+                color: var(--demo-muted);
+                font-size: 14px;
+                line-height: 1.5;
+                margin-bottom: 14px;
+            }
+            .demo-video {
+                width: 100%;
+                border-radius: 16px;
+                border: 1px solid var(--demo-line);
+                background: #000;
+            }
+            .demo-faq .widget-accordion {
+                border: 1px solid var(--demo-line);
+                border-radius: 16px;
+                overflow: hidden;
+            }
+            .demo-faq .widget-accordion .p-Accordion-child {
+                border-top: 1px solid var(--demo-line);
+            }
+            .demo-faq-button .widget-button {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                width: auto;
+                min-width: 240px;
+                border: 0;
+                border-radius: 14px;
+                padding: 12px 18px;
+                background: linear-gradient(135deg, #2f6fa3 0%, #4d8fc4 100%);
+                color: white;
+                font-weight: 700;
+                text-align: center !important;
+                line-height: 1.2 !important;
+                box-shadow: 0 12px 22px rgba(47, 111, 163, 0.24);
+            }
             @media (max-width: 900px) {
                 .demo-title {
                     max-width: none;
@@ -387,6 +451,107 @@ def _selection_summary(selection):
       </div>
     </div>
     """
+
+
+def _first_available_video():
+    base_dir = Path(__file__).resolve().parent
+    for title, relative_path in VIDEO_FILES:
+        video_path = base_dir / relative_path
+        if video_path.is_file():
+            return title, video_path
+    return None
+
+
+def _video_card_html(title, video_path):
+    return f"""
+    <div class="demo-card">
+      <div class="demo-section-title">{title}</div>
+      <div class="demo-section-copy">
+        Recorded example run from the notebook assets directory.
+      </div>
+      <video class="demo-video" controls autoplay muted preload="metadata">
+        <source src="{video_path.as_posix()}" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+    </div>
+    """
+
+
+def _faq_section():
+    video_entry = _first_available_video()
+
+    answers = []
+    for _, answer in FAQ_ITEMS:
+        answers.append(
+            widgets.HTML(
+                value=f"""
+                <div class="demo-section-copy" style="margin: 0; padding: 2px 0 8px 0;">
+                  {answer}
+                </div>
+                """
+            )
+        )
+
+    accordion = widgets.Accordion(children=answers, selected_index=None)
+    for index, (question, _) in enumerate(FAQ_ITEMS):
+        accordion.set_title(index, question)
+
+    video_button = widgets.Button(
+        description="Play Recorded Demo",
+        icon="play",
+        disabled=video_entry is None,
+    )
+    video_button_box = widgets.Box([video_button])
+    video_button_box.add_class("demo-faq-button")
+
+    if video_entry is None:
+        video_panel = widgets.HTML(
+            value="""
+            <div class="demo-card">
+              <div class="demo-section-copy" style="margin-bottom: 0;">
+                No recorded demo video was found in the notebook assets directory.
+              </div>
+            </div>
+            """
+        )
+    else:
+        video_panel = widgets.HTML(value="")
+
+    def _show_video(_):
+        if video_entry is None:
+            return
+        title, video_path = video_entry
+        video_panel.value = _video_card_html(title, video_path)
+
+    video_button.on_click(_show_video)
+
+    wrapper = widgets.VBox(
+        [
+            widgets.HTML(
+                value="""
+                <div class="demo-card">
+                  <div class="demo-section-title">FAQ</div>
+                  <div class="demo-section-copy">
+                    Short answers to common setup issues. Use the button below to launch the recorded demo inline.
+                  </div>
+                </div>
+                """
+            ),
+            video_button_box,
+            accordion,
+            video_panel,
+        ]
+    )
+    wrapper.add_class("demo-faq")
+    return wrapper
+
+
+def run_info_ui():
+    _inject_styles()
+    container = widgets.VBox([_faq_section()], layout=widgets.Layout(width="100%"))
+    container.add_class("demo-shell")
+    container.add_class("demo-stack")
+    display(container)
 
 
 def run_ui(on_start=None):
@@ -561,3 +726,4 @@ def run_ui(on_start=None):
 
 
 show_demo_ui = run_ui
+show_demo_info_ui = run_info_ui
