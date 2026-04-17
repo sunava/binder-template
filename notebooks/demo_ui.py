@@ -430,10 +430,10 @@ def run_ui(on_start=None):
         ],
         value=selection["object_kind"],
         description="Target",
-        layout=widgets.Layout(display=""),
     )
+    object_kind_box = widgets.Box([object_kind], layout=widgets.Layout(display=""))
     if not ACTION_OBJECT_OPTIONS[selection["action"]]:
-        object_kind.layout.display = "none"
+        object_kind_box.layout.display = "none"
 
     summary = widgets.HTML(value=_selection_summary(selection))
     start_button = widgets.Button(description="Start Demo", icon="play")
