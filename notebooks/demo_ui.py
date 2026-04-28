@@ -65,6 +65,7 @@ CURRENT_DEMO_SELECTION = {}
 BACKGROUND_IMAGE_PATH = (
     Path(__file__).resolve().parent.parent.joinpath("img", "ease-background.png")
 )
+LOGO_IMAGE_PATH = Path(__file__).resolve().parent.parent.joinpath("img", "aicor-logo.png")
 RVIZ_CONFIG_DIRECTORY = Path(__file__).resolve().parent / "rviz"
 ACTIVE_RVIZ_CONFIG_PATH = Path("/home/jovyan/.rviz2/default.rviz")
 SHARED_RVIZ_CONFIG_PATH = RVIZ_CONFIG_DIRECTORY / "shared.rviz"
@@ -200,6 +201,17 @@ def _inject_styles():
                 gap: 10px;
                 margin-bottom: 24px;
                 width: min(100%, 520px);
+            }
+            .demo-logo-wrap {
+                display: flex;
+                justify-content: center;
+                margin-bottom: 22px;
+            }
+            .demo-logo {
+                width: min(100%, 360px);
+                height: auto;
+                display: block;
+                filter: drop-shadow(0 10px 20px rgba(23, 50, 77, 0.12));
             }
             .demo-kicker {
                 display: inline-flex;
@@ -424,6 +436,9 @@ def _inject_styles():
                 box-shadow: 0 12px 22px rgba(47, 111, 163, 0.24);
             }
             @media (max-width: 900px) {
+                .demo-logo {
+                    width: min(100%, 280px);
+                }
                 .demo-title {
                     max-width: none;
                 }
@@ -432,6 +447,24 @@ def _inject_styles():
             """
 
     display(HTML(style_template.replace("__BACKGROUND_IMAGE__", background_image)))
+
+
+def _logo_header():
+    if not LOGO_IMAGE_PATH.exists():
+        return None
+
+    logo_data = b64encode(LOGO_IMAGE_PATH.read_bytes()).decode("ascii")
+    return widgets.HTML(
+        value=f"""
+        <div class="demo-logo-wrap">
+          <img
+            class="demo-logo"
+            src="data:image/png;base64,{logo_data}"
+            alt="AICOR"
+          />
+        </div>
+        """
+    )
 
 
 def _selection_summary(selection):
@@ -550,7 +583,12 @@ def _faq_section():
 
 def run_info_ui():
     _inject_styles()
-    container = widgets.VBox([_faq_section()], layout=widgets.Layout(width="100%"))
+    children = []
+    logo_header = _logo_header()
+    if logo_header is not None:
+        children.append(logo_header)
+    children.append(_faq_section())
+    container = widgets.VBox(children, layout=widgets.Layout(width="100%"))
     container.add_class("demo-shell")
     container.add_class("demo-stack")
     display(container)
@@ -723,7 +761,12 @@ def run_ui(on_start=None):
     start_button.on_click(_handle_start)
     stop_button.on_click(_handle_stop)
 
-    container = widgets.VBox([controls], layout=widgets.Layout(width="100%"))
+    children = []
+    logo_header = _logo_header()
+    if logo_header is not None:
+        children.append(logo_header)
+    children.append(controls)
+    container = widgets.VBox(children, layout=widgets.Layout(width="100%"))
     container.add_class("demo-shell")
     display(container)
 
