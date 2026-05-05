@@ -147,10 +147,15 @@ def _build_demo_subprocess_command():
     ]
 
 
-def _inject_styles():
+def _inject_styles(include_background=True):
     background_image = ""
-    if BACKGROUND_IMAGE_PATH.exists():
+    if include_background and BACKGROUND_IMAGE_PATH.exists():
         background_image = b64encode(BACKGROUND_IMAGE_PATH.read_bytes()).decode("ascii")
+    background_layer = (
+        f',\n                    url("data:image/png;base64,{background_image}")'
+        if background_image
+        else ""
+    )
 
     style_template = """
             <style>
@@ -178,8 +183,7 @@ def _inject_styles():
                 position: absolute;
                 inset: 0;
                 background:
-                    linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(247, 250, 252, 0.84) 100%),
-                    url("data:image/png;base64,__BACKGROUND_IMAGE__");
+                    linear-gradient(180deg, rgba(255, 255, 255, 0.78) 0%, rgba(247, 250, 252, 0.84) 100%)__BACKGROUND_LAYER__;
                 background-position: center top, calc(50% + 240px) -56px;
                 background-repeat: no-repeat;
                 background-size: auto, 112% auto;
@@ -446,7 +450,7 @@ def _inject_styles():
             </style>
             """
 
-    display(HTML(style_template.replace("__BACKGROUND_IMAGE__", background_image)))
+    display(HTML(style_template.replace("__BACKGROUND_LAYER__", background_layer)))
 
 
 def _logo_header():
@@ -582,12 +586,8 @@ def _faq_section():
 
 
 def run_info_ui():
-    _inject_styles()
-    children = []
-    logo_header = _logo_header()
-    if logo_header is not None:
-        children.append(logo_header)
-    children.append(_faq_section())
+    _inject_styles(include_background=False)
+    children = [_faq_section()]
     container = widgets.VBox(children, layout=widgets.Layout(width="100%"))
     container.add_class("demo-shell")
     container.add_class("demo-stack")
